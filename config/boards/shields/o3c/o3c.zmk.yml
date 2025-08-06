@@ -1,0 +1,9 @@
+file_format: "1"
+id: o3c
+name: O3C
+type: shield
+url: https://github.com/cr3eperall/
+requires: [pro_micro, hall-sensor-zmk-module]
+exposes: [i2c_oled]
+features:
+  - keys
