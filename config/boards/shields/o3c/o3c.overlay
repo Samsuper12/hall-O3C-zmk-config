@@ -34,7 +34,7 @@
     transform = <&default_transform>;
 };
 
-# Move to snippet
+// Move to snippet
 &adc {
     status = "okay";
 };
