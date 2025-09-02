@@ -1,5 +1,4 @@
 include:
 - board: nice_nano_v2
   shield: o3c
-  snippet: zmk-usb-logging
-  snippet: zmk-hall-sensor
+  snippet: zmk-usb-logging zmk-hall-sensor
