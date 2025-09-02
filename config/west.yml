@@ -12,5 +12,8 @@ manifest:
     - name: hall-sensor-zmk-module
       remote: Samsuper12
       revision: main
+    - name: bridge-zmk-module
+      remote: Samsuper12
+      revision: main
   self:
     path: config
