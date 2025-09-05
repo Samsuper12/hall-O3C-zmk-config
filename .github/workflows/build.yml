@@ -23,8 +23,11 @@ jobs:
       
       - name: Initialize West workspace
         run: |
+          base_dir=$(mktemp -d)
+          cp -R . "$base_dir/config"
+          cd "$base_dir/config"
           west init -l .
-          west update
+          west update --fetch-opt=--filter=tree:0
       
       - name: Collect proto files
         run: |
