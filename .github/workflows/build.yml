@@ -1,6 +1,76 @@
 name: Build ZMK firmware
 on: [push, pull_request, workflow_dispatch]
-
 jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+  
+  collect-proto-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Install West
+        run: |
+          pip install west
+      
+      - name: Initialize West workspace
+        run: |
+          west init -l .
+          west update
+      
+      - name: Collect proto files
+        run: |
+          mkdir -p collected-protos
+
+          echo "Collecting proto files from modules..."
+
+          # Get list of module paths from west
+          for module_path in $(west list -f {path}); do
+            if [ -d "$module_path/proto" ]; then
+              echo "Found proto directory in: $module_path"
+              # Copy all proto files maintaining directory structure
+              find "$module_path/proto" -name "*.proto" -type f | while read proto_file; do
+                # Create relative path for organizing files
+                rel_path=$(echo "$proto_file" | sed "s|$module_path/||")
+                target_dir="collected-protos/$(basename $module_path)/${rel_path%/*}"
+                mkdir -p "$target_dir"
+                cp "$proto_file" "$target_dir/"
+                echo "Collected: $proto_file -> $target_dir/"
+              done
+            fi
+          done
+
+          # Also collect local proto files if they exist
+          if [ -d "proto" ]; then
+            echo "Collecting local proto files..."
+            find proto -name "*.proto" -type f | while read proto_file; do
+              target_dir="collected-protos/local/$(dirname $proto_file)"
+              mkdir -p "$target_dir"
+              cp "$proto_file" "$target_dir/"
+              echo "Collected: $proto_file -> $target_dir/"
+            done
+          fi
+
+          # List what we collected
+          echo "=== Collected Proto Files ==="
+          find collected-protos -name "*.proto" -type f
+
+          # Create archive
+          tar -czf proto-files.tar.gz -C collected-protos .
+          echo "Archive contents:"
+          tar -tzf proto-files.tar.gz
+      
+      - name: Upload proto files artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proto-files
+          path: proto-files.tar.gz
+          retention-days: 30
