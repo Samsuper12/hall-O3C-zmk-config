@@ -14,6 +14,6 @@ manifest:
       revision: main
     - name: bridge-zmk-module
       remote: Samsuper12
-      revision: debug
+      revision: main
   self:
     path: config
