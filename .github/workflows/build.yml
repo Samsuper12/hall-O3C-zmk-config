@@ -21,58 +21,10 @@ jobs:
         run: |
           pip install west
       
-      - name: Prepare variables
-        shell: sh -x {0}
-        env:
-          board: ${{ matrix.board }}
-          shield: ${{ matrix.shield }}
-          artifact_name: ${{ matrix.artifact-name }}
-          snippet: ${{ matrix.snippet }}
+      - name: Initialize West workspace
         run: |
-          if [ -e zephyr/module.yml ]; then
-            export zmk_load_arg=" -DZMK_EXTRA_MODULES='${GITHUB_WORKSPACE}'"
-            new_tmp_dir="${TMPDIR:-/tmp}/zmk-config"
-            mkdir -p "${new_tmp_dir}"
-            echo "base_dir=${new_tmp_dir}" >> $GITHUB_ENV
-          else
-            echo "base_dir=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-          fi
-
-          if [ -n "${snippet}" ]; then
-            extra_west_args="-S \"${snippet}\""
-          fi
-
-          echo "zephyr_version=${ZEPHYR_VERSION}" >> $GITHUB_ENV
-          echo "extra_west_args=${extra_west_args}" >> $GITHUB_ENV
-          echo "extra_cmake_args=${shield:+-DSHIELD=\"$shield\"}${zmk_load_arg}" >> $GITHUB_ENV
-          echo "display_name=${shield:+$shield - }${board}" >> $GITHUB_ENV
-          echo "artifact_name=${artifact_name:-${shield:+$shield-}${board}-zmk}" >> $GITHUB_ENV
-
-      - name: Cache west modules
-        uses: actions/cache@v4
-        continue-on-error: true
-        env:
-          cache_name: cache-zephyr-${{ env.zephyr_version }}-modules
-        with:
-          path: |
-            ${{ env.base_dir }}/modules/
-            ${{ env.base_dir }}/tools/
-            ${{ env.base_dir }}/zephyr/
-            ${{ env.base_dir }}/bootloader/
-            ${{ env.base_dir }}/zmk/
-          key: ${{ runner.os }}-build-${{ env.cache_name }}-${{ hashFiles('**/west.yml', '**/build.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache_name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: West Init
-        working-directory: ${{ env.base_dir }}
-        run: west init -l "${{ env.base_dir }}/${{ inputs.config_path }}"
-
-      - name: West Update
-        working-directory: ${{ env.base_dir }}
-        run: west update --fetch-opt=--filter=tree:0
+          west init -l ./config
+          west update
       
       - name: Collect proto files
         run: |
