@@ -4,5 +4,5 @@ jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
   
-  collect-bridge-proto:
-    uses: Samsuper12/bridge-zmk-module/.github/workflows/collect-bridge-proto.yml@main
+  bridge:
+    uses: Samsuper12/bridge-zmk-module/.github/workflows/collect-proto.yml@main
