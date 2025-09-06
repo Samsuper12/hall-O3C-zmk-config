@@ -32,7 +32,7 @@ jobs:
           echo "Collecting proto files from modules..."
 
           for module_path in $(west list -f {path}); do
-              if [ -d "$module_path/proto" ]; then
+              if [ -d "$module_path/proto" -a "$module_path" != "modules/msgs/zmk-studio-messages" ]; then
                   echo "Found proto directory in: $module_path"
                   find "$module_path/proto" -name "*.proto" -type f | while read proto_file; do
                       cp "$proto_file" "collected-protos/"
@@ -40,16 +40,10 @@ jobs:
                   done
               fi
           done
-
-          find collected-protos -name "*.proto" -type f
-
-          tar -czf proto-files.tar.gz -C collected-protos .
-          echo "Archive contents:"
-          tar -tzf proto-files.tar.gz
       
       - name: Upload proto files artifact
         uses: actions/upload-artifact@v4
         with:
           name: proto-files
-          path: proto-files.tar.gz
+          path: collected-protos
           retention-days: 30
