@@ -11,8 +11,8 @@
     behaviors {
         dyn0: dynamic_0 {
             compatible = "zmk,behavior-dynamic";
-            #binding-cells = <2>;
-            bindings = <&kp H &kp Y &studio_unlock>;
+            #binding-cells = <0>;
+            bindings = <&kp H &kp Y &kp Z>;
             trigger_values = <35 55 75>;
         };
     };
@@ -22,7 +22,7 @@
 
         default_layer {
             bindings = <
-            &kp B
+            &kp A
             >;
         };
     };
